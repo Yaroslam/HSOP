@@ -77,12 +77,12 @@ class Queue
     }
 
     // запросы статусов
-    public function get_dequeue_status(): int
+    public function dequeueStatus(): int
     {
         return $this->dequeueStatus;
     }
 
-    public function get_get_status(): int
+    public function getStatus(): int
     {
         return $this->getStatus;
     }
