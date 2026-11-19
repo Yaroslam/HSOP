@@ -14,34 +14,51 @@ final class GradeCalculator
 
     public function calculateAverage(array $grades): float
     {
-        if ($grades === []) {
-            throw new InvalidArgumentException('Список оценок не может быть пустым');
-        }
+        $this->assertNotEmpty($grades);
 
         $sum = 0.0;
 
         foreach ($grades as $grade) {
-            if (!is_int($grade) && !is_float($grade)) {
-                throw new InvalidArgumentException(
-                    sprintf('Оценка должна быть числом, получено: %s', get_debug_type($grade))
-                );
-            }
-
-            // NaN не поймать сравнениями: любое сравнение с NaN даёт false
-            if (is_float($grade) && !is_finite($grade)) {
-                throw new InvalidArgumentException('Оценка не может быть NaN или INF');
-            }
-
-            if ($grade < self::MIN_GRADE || $grade > self::MAX_GRADE) {
-                throw new InvalidArgumentException(
-                    sprintf('Оценка вне диапазона [%d, %d]: %s', self::MIN_GRADE, self::MAX_GRADE, $grade)
-                );
-            }
+            $this->assertIsNumber($grade);
+            $this->assertIsFinite($grade);
+            $this->assertInRange($grade);
 
             $sum += $grade;
         }
 
         return $sum / count($grades);
+    }
+
+    private function assertNotEmpty(array $grades): void
+    {
+        if ($grades === []) {
+            throw new InvalidArgumentException('Список оценок не может быть пустым');
+        }
+    }
+
+    private function assertIsNumber(mixed $grade): void
+    {
+        if (!is_int($grade) && !is_float($grade)) {
+            throw new InvalidArgumentException(
+                sprintf('Оценка должна быть числом, получено: %s', get_debug_type($grade))
+            );
+        }
+    }
+
+    private function assertIsFinite(int|float $grade): void
+    {
+        if (is_float($grade) && !is_finite($grade)) {
+            throw new InvalidArgumentException('Оценка не может быть NaN или INF');
+        }
+    }
+
+    private function assertInRange(int|float $grade): void
+    {
+        if ($grade < self::MIN_GRADE || $grade > self::MAX_GRADE) {
+            throw new InvalidArgumentException(
+                sprintf('Оценка вне диапазона [%d, %d]: %s', self::MIN_GRADE, self::MAX_GRADE, $grade)
+            );
+        }
     }
 }
 
